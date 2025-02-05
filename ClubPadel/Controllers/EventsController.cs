@@ -17,9 +17,9 @@ namespace ClubPadel.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Event param)
+        public async Task<IActionResult> Create(Event param)
         {
-            return Ok(_eventService.Create(param));
+            return Ok(await _eventService.Create(param));
         }
 
         //[HttpPut]
@@ -37,6 +37,7 @@ namespace ClubPadel.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
+            Console.WriteLine("Trying to log get all events");
             return Ok(_eventService.GetAllEvents());
         }
 

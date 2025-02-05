@@ -66,9 +66,6 @@ namespace ClubPadel.Services
 
                 // Save changes to the repository
                 _repository.Save(eventItem);
-
-                // Update the Telegram message
-                
             }
             else
             {
@@ -131,7 +128,7 @@ namespace ClubPadel.Services
         private static StringBuilder GetHeaderText(Event eventItem)
         {
             var message = new StringBuilder();
-            message.AppendLine($"🎾 {eventItem.Name} - {eventItem.Date} at {eventItem.Time}\n");
+            message.AppendLine($"🎾 {eventItem.Name}\n");
             message.AppendLine($"📅 {eventItem.Date.DateTime.ToShortDateString()} at {eventItem.Time}");
             message.AppendLine($"📍 {eventItem.Location}\n");
             message.AppendLine("👥 Participants:");
@@ -143,10 +140,8 @@ namespace ClubPadel.Services
         /// </summary>
         public async Task<Event> Create(Event eventItem)
         {
-            // Send the event message to Telegram
             var message = GetHeaderText(eventItem);
             message.AppendLine("No participants yet.");
-
             var inlineKeyboard = new InlineKeyboardMarkup(new[]
             {
                 new[]
@@ -157,11 +152,11 @@ namespace ClubPadel.Services
             });
 
             var sentMessage = await _telegramBotClient.SendMessage(
-                chatId: ChatId,
-                text: message.ToString(),
-                parseMode: ParseMode.MarkdownV2,
-                replyMarkup: inlineKeyboard
-            );
+                    chatId: ChatId,
+                    text: EscapeMarkdown(message.ToString()),
+                    parseMode: ParseMode.MarkdownV2,
+                    replyMarkup: inlineKeyboard
+                );
 
             // Store the Telegram message ID in the event
             eventItem.TelegramMessageId = sentMessage.MessageId;

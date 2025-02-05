@@ -11,7 +11,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowVueApp",
-        policy => policy.WithOrigins("http://localhost:3000", "https://7880-18-216-133-68.ngrok-free.app", "https://clubpadeldubaibe-f5heg2ajhed7fqcv.uaenorth-01.azurewebsites.net/")
+        policy => policy.WithOrigins("http://localhost:3000", "https://7880-18-216-133-68.ngrok-free.app", "https://clubpadeldubaibe-f5heg2ajhed7fqcv.uaenorth-01.azurewebsites.net")
                         .AllowAnyMethod()
                         .AllowAnyHeader());
 });
