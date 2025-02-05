@@ -1,0 +1,82 @@
+﻿using ClubPadel.Models;
+using ClubPadel.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ClubPadel.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class EventsController: ControllerBase
+    {
+        private readonly EventService _eventService;
+
+        public EventsController(EventService eventService)
+        {
+            _eventService = eventService;
+            //new TelegramBotService().SendEventMessage().GetAwaiter().GetResult();
+        }
+
+        [HttpPost]
+        public IActionResult Create(Event param)
+        {
+            return Ok(_eventService.Create(param));
+        }
+
+        //[HttpPut]
+        //public IActionResult Update(Event param)
+        //{
+        //    return Ok(_eventService.Update(param));
+        //}
+
+        //[HttpDelete]
+        //public IActionResult Delete(Event param)
+        //{
+        //    return Ok(_eventService.Delete(param));
+        //}
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            return Ok(_eventService.GetAllEvents());
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetById(Guid id)
+        {
+            var eventItem = _eventService.GetEventById(id);
+            if (eventItem == null) return NotFound();
+
+            return Ok(eventItem);
+        }
+
+        [HttpPost("{id}/participants")]
+        public async Task<IActionResult> AddParticipant(Guid id, [FromBody] Participant participant)
+        {
+            //_eventService.AddParticipant(id, participant);
+            //return Ok();
+            //var participant = new Participant
+            //{
+            //    UserName = participantName,
+            //    Name = participantName,
+            //    Confirmed = false
+            //};
+
+            await _eventService.AddParticipant(id, participant);
+            return Ok();
+        }
+
+        [HttpPost("{id}/participants/confirm")]
+        public async Task<IActionResult> ConfirmParticipant(Guid id, [FromBody] Participant participant)
+        {
+            await _eventService.ConfirmParticipant(id, participant.Id, participant.Confirmed);
+            return Ok();
+        }
+
+        [HttpDelete("{id}/participants")]
+        public async Task<IActionResult> RemoveParticipant(Guid id, [FromBody] Guid participanId)
+        {
+            await _eventService.RemoveParticipant(id, participanId);
+            return Ok();
+        }
+    }
+}
