@@ -1,30 +1,8 @@
-# Cache directories
 .vs
 .nuget
 .idea
 
-# User-specific and auto-generated files
-*.rsuser
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
-*.db
-*.dgml
-*.css
-*.js.map
-*.css.map
-*.wixobj
-*.rar
-*.log
-*.pubxml
 
-# Node.js files
-bower_components/
-node_modules/
-package-lock.json
-
-# .NET Core
 project.lock.json
 project.fragment.lock.json
 artifacts/
