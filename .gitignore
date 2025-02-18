@@ -1,9 +1,60 @@
-.vs
-.nuget
-.idea
+# 🏗 Build Artifacts
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.cache
+*.ilk
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.nupkg
+*.snupkg
+*.psess
 
-
+# 📦 NuGet Packages
+packages/
+!packages/repositories.config
+*.nupkg
 project.lock.json
-project.fragment.lock.json
-artifacts/
-**/Properties/launchSettings.json
+project.assets.json
+PackageReference.cache
+.vs/
+
+# 🔧 Configuration & Logs
+*.config
+*.log
+*.tlog
+*.lastcodeanalysissucceeded
+appsettings.json
+appsettings.Development.json
+secrets.json
+
+# 🏛 Entity Framework Migrations
+Migrations/
+
+# 🖥 Rider & VS Code
+.idea/
+.vscode/
+.vscode/*
+
+# 🛠 Resharper & Rider Files
+*.DotSettings.user
+resharper.xml
+
+# 🔐 User Secrets
+secrets.json
+*.key
+
+# 🛠 Global Tools & Dependency Files
+.nuget/
+node_modules/
+dist/
+out/
+
+# 🚀 Docker & Deployment
+Dockerfile
+docker-compose*
+.env

@@ -274,6 +274,11 @@
             "type": "string",
             "nullable": true
           },
+          "telegramMessageId": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
           "date": {
             "type": "string",
             "format": "date-time"
@@ -286,44 +291,54 @@
             "type": "string",
             "nullable": true
           },
+          "isOnWaitList": {
+            "type": "boolean"
+          },
           "participants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Participant"
             },
             "nullable": true
-          },
-          "waitlist": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Participant"
-            },
-            "nullable": true
-          },
-          "telegramMessageId": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
           }
         },
         "additionalProperties": false
       },
       "Participant": {
+        "required": [
+          "userName"
+        ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
           },
-          "userName": {
-            "type": "string",
-            "nullable": true
-          },
           "name": {
             "type": "string",
             "nullable": true
           },
+          "userName": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
           "confirmed": {
+            "type": "boolean"
+          },
+          "event": {
+            "$ref": "#/components/schemas/Event"
+          },
+          "eventId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isOnWaitList": {
             "type": "boolean"
           }
         },

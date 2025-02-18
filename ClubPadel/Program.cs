@@ -1,6 +1,8 @@
 ﻿using ClubPadel.DL;
+using ClubPadel.DL.EfCore;
 using ClubPadel.Models;
 using ClubPadel.Services;
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,15 +19,33 @@ builder.Services.AddCors(options =>
 });
 
 
-builder.Services.AddSingleton<IBaseRepository<Event>>(sp =>
-    new EventRepository("eventRegistration.db", "events"));
-
-builder.Services.AddSingleton<EventService>();
+//builder.Services.AddSingleton<IBaseRepository<Event>>(sp =>
+//    new EventRepository("eventRegistration.db", "events"));
+builder.Services.AddScoped<IBaseRepository<Event>, EventSqlRepository>();
+builder.Services.AddScoped<EventSqlRepository>();
+builder.Services.AddScoped<ParticipantSqlRepository>();
+builder.Services.AddScoped<EventService>();
 
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<ITelegramBotClient>(provider =>
+builder.Services.AddScoped<ITelegramBotClient>(provider =>
     new TelegramBotClient(Environment.GetEnvironmentVariable("TgBotToken")));
 builder.Services.AddScoped<ITelegramBotService, TelegramBotService>();
+
+
+builder.Configuration.SetBasePath(Directory.GetCurrentDirectory());
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new Exception("Database connection string is missing in appsettings.json");
+}
+
+// Register EF Core with SQL Server
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString), ServiceLifetime.Scoped);
 
 
 

@@ -69,7 +69,7 @@ namespace ClubPadel.Controllers
         [HttpPost("{id}/participants/confirm")]
         public async Task<IActionResult> ConfirmParticipant(Guid id, [FromBody] Participant participant)
         {
-            await _eventService.ConfirmParticipant(id, participant.Id, participant.Confirmed);
+            await _eventService.ConfirmParticipant(id, participant.Id, participant.Confirmed, id);
             return Ok();
         }
 

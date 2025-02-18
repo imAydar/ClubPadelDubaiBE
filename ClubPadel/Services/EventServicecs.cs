@@ -1,5 +1,8 @@
 ﻿using ClubPadel.DL;
+using ClubPadel.DTO;
+using ClubPadel.Extensions;
 using ClubPadel.Models;
+using Microsoft.Extensions.Logging;
 using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -14,14 +17,15 @@ namespace ClubPadel.Services
         private static readonly long ChatId = Convert.ToInt64(Environment.GetEnvironmentVariable("TgChatId"));
 
         private readonly ITelegramBotClient _telegramBotClient;
-        private readonly IBaseRepository<Event> _repository;
+        private readonly EventSqlRepository _repository;
+        private readonly ParticipantSqlRepository _participantRepository;
 
-        public EventService(ITelegramBotClient telegramBotClient, IBaseRepository<Event> repository)
+        public EventService(ITelegramBotClient telegramBotClient, EventSqlRepository repository, ParticipantSqlRepository participantRepository)
         {
             _telegramBotClient = telegramBotClient ?? throw new ArgumentNullException(nameof(telegramBotClient));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _participantRepository = participantRepository;
         }
-
 
         public async Task AddParticipant(int messageId, string userName)
         {
@@ -50,22 +54,19 @@ namespace ClubPadel.Services
             }
 
             // Check if the user is already a participant
-            var isAlreadyParticipant = eventItem.Participants.Any(p => p.Name == participant.Name) ||
-                                       eventItem.Waitlist.Any(p => p.Name == participant.Name);
+            var isAlreadyParticipant = eventItem.Participants.Any(p => p.Name == participant.Name);
+                                   //    eventItem.Waitlist.Any(p => p.Name == participant.Name);
 
             if (!isAlreadyParticipant)
             {
-                if (eventItem.Participants.Count < MaxParticipants)
+                if (eventItem.Participants.Count >= MaxParticipants)
                 {
-                    eventItem.Participants.Add(participant);
-                }
-                else
-                {
-                    eventItem.Waitlist.Add(participant);
+                    participant.IsOnWaitList = true;
                 }
 
-                // Save changes to the repository
-                _repository.Save(eventItem);
+                participant.EventId = eventId;
+                //eventItem.Participants.Add(participant);
+                _participantRepository.Save(participant);
             }
             else
             {
@@ -80,41 +81,54 @@ namespace ClubPadel.Services
         private async Task UpdateMessageWithParticipantsAsync(Event eventItem)
         {
             var message = GetHeaderText(eventItem);
-            if (eventItem.Participants.Count == 0)
+
+            var players = eventItem.Participants
+                .Where(p => p.IsOnWaitList)
+                .OrderBy(p => p.CreatedAt)
+                .ToList();
+            var waitlist = eventItem.Participants
+                .Except(players)
+                .OrderBy(p => p.CreatedAt)
+                .ToList();
+
+            if (players?.Count == 0)
             {
                 message.AppendLine("No participants yet.");
             }
             else
             {
-                for (int i = 0; i < eventItem.Participants.Count; i++)
+                for (int i = 0; i < players?.Count; i++)
                 {
-                    var participant = eventItem.Participants[i];
+                    var participant = players[i];
                     var confirmed = participant.Confirmed ? "✅" : "⏳";
                     message.AppendLine($"{i + 1}. {participant.Name} {confirmed}");
                 }
             }
 
-            if (eventItem.Waitlist.Count > 0)
+            if (waitlist?.Count > 0)
             {
                 message.AppendLine("\n📌 Waitlist:");
-                for (int i = 0; i < eventItem.Waitlist.Count; i++)
+                for (int i = 0; i < waitlist.Count; i++)
                 {
-                    var participant = eventItem.Waitlist[i];
+                    var participant = waitlist[i];
                     var confirmed = participant.Confirmed ? "✅" : "⏳";
                     message.AppendLine($"{i + 1}. {participant.Name} {confirmed}");
                 }
             }
 
-            var inlineKeyboard = new InlineKeyboardMarkup(new[]
-            {
-                new[]
-                {
+            var inlineKeyboard = new InlineKeyboardMarkup([
+                [
                     InlineKeyboardButton.WithCallbackData("❤️ Join Event", "join_event"),
                     InlineKeyboardButton.WithCallbackData("Exit Event", "exit_event")
-                }
-            });
+                ]
+            ]);
 
             var chatId = new ChatId(ChatId);
+            //var locationMessage = await _telegramBotClient.SendLocation(
+            //    chatId: chatId,
+            //    latitude: 0,
+            //    longitude: 0
+            //);
             await _telegramBotClient.EditMessageText(
                 chatId: chatId,
                 messageId: eventItem.TelegramMessageId,
@@ -150,7 +164,7 @@ namespace ClubPadel.Services
                     InlineKeyboardButton.WithCallbackData("Exit Event", "exit_event")
                 }
             });
-
+        
             var sentMessage = await _telegramBotClient.SendMessage(
                     chatId: ChatId,
                     text: EscapeMarkdown(message.ToString()),
@@ -170,8 +184,10 @@ namespace ClubPadel.Services
         /// <summary>
         /// Confirms a participant for an event.
         /// </summary>
-        public async Task ConfirmParticipant(Guid eventId, Guid participantId, bool confirmed)
+        public async Task ConfirmParticipant(Guid eventId, Guid participantId, bool confirmed, Guid userId)
         {
+            //var user = 
+            //if (participantId != userId && userId != )
             var eventItem = _repository.GetById(eventId);
             if (eventItem == null) return;
 
@@ -182,76 +198,100 @@ namespace ClubPadel.Services
                 _repository.Save(eventItem); // Save changes to the repository
                 await UpdateMessageWithParticipantsAsync(eventItem);
             }
+
         }
 
-        public async Task RemoveParticipant(int messageId, string userName)
+        public async Task RemoveParticipant(int messageId, string? userName)
         {
             var eventItem = _repository.GetAll().First(e => e.TelegramMessageId == messageId);
             var user = eventItem.Participants.FirstOrDefault(p => p.UserName == userName); //?? eventItem.Waitlist.FirstOrDefault(p => p.UserName == userName);
-            if (user != null)
-            {
-                await RemoveParticipant(eventItem.Id, user.Id);
-                return;
-            }
-            else
-            {
-                user = eventItem.Waitlist.FirstOrDefault(p => p.UserName == userName);
-                if (user != null)
-                {
-                    await RemoveWaiter(eventItem.Id, user.Id);
-                    return;
-                }
-            }
 
-            Console.WriteLine($"User {userName} already removed from event {eventItem.Name}");
+            await RemoveParticipant(eventItem.Id, user.Id);
         }
 
-        /// <summary>
-        /// Removes a participant from an event.
-        /// </summary>
         public async Task RemoveParticipant(Guid eventId, Guid participantId)
         {
             var eventItem = _repository.GetById(eventId);
-            if (eventItem == null) return;
+            var user = eventItem.Participants.FirstOrDefault(p => p.Id == participantId); //?? eventItem.Waitlist.FirstOrDefault(p => p.UserName == userName);
 
-            eventItem.Participants.RemoveAll(p => p.Id == participantId);
 
-            if (eventItem.Waitlist.Count > 0)
+
+            //if (user != null)
+            //{
+            //    await RemoveParticipant(eventItem.Id, user.Id);
+            //    return;
+            //}
+            //else
+            //{
+            //    user = eventItem.Waitlist.FirstOrDefault(p => p.UserName == userName);
+            //    if (user != null)
+            //    {
+            //        await RemoveWaiter(eventItem.Id, user.Id);
+            //        return;
+            //    }
+            //}
+            eventItem.Participants.RemoveAll(p => p.Id == user.Id);
+            if (!user.IsOnWaitList)
             {
-                var nextInLine = eventItem.Waitlist[0];
-                eventItem.Participants.Add(nextInLine);
-                eventItem.Waitlist.RemoveAt(0);
+                var next = eventItem.Participants.OrderBy(p => p.CreatedAt).FirstOrDefault(p => p.IsOnWaitList);
+                if (next != null)
+                {
+                    next.IsOnWaitList = false;
+                }
             }
 
             _repository.Save(eventItem); // Save changes to the repository
             await UpdateMessageWithParticipantsAsync(eventItem);
+
+            Console.WriteLine($"User {user.UserName} removed from event {eventItem.Name}");
         }
 
-        public async Task RemoveWaiter(Guid eventId, Guid participantId)
-        {
-            var eventItem = _repository.GetById(eventId);
-            if (eventItem == null) return;
+        ///// <summary>
+        ///// Removes a participant from an event.
+        ///// </summary>
+        //public async Task RemoveParticipant(Guid eventId, Guid participantId)
+        //{
+        //    var eventItem = _repository.GetById(eventId);
+        //    if (eventItem == null) return;
 
-            eventItem.Waitlist.RemoveAll(p => p.Id == participantId);
+        //    eventItem.Participants.RemoveAll(p => p.Id == participantId);
 
-            _repository.Save(eventItem); // Save changes to the repository
-            await UpdateMessageWithParticipantsAsync(eventItem);
-        }
+        //    if (eventItem.Waitlist?.Count > 0)
+        //    {
+        //        var nextInLine = eventItem.Waitlist[0];
+        //        eventItem.Participants.Add(nextInLine);
+        //        eventItem.Waitlist.RemoveAt(0);
+        //    }
+
+        //    _repository.Save(eventItem); // Save changes to the repository
+        //    await UpdateMessageWithParticipantsAsync(eventItem);
+        //}
+
+        //public async Task RemoveWaiter(Guid eventId, Guid participantId)
+        //{
+        //    var eventItem = _repository.GetById(eventId);
+        //    if (eventItem == null) return;
+
+        //    eventItem.Waitlist.RemoveAll(p => p.Id == participantId);
+
+        //    _repository.Save(eventItem); // Save changes to the repository
+        //    await UpdateMessageWithParticipantsAsync(eventItem);
+        //}
 
         /// <summary>
         /// Gets all events.
         /// </summary>
-        public IEnumerable<Event> GetAllEvents()
+        public IEnumerable<EventDto> GetAllEvents()
         {
-            return _repository.GetAll();
+            return _repository.GetAll().Select(e => e.ToDto());
         }
 
         /// <summary>
         /// Gets an event by ID.
         /// </summary>
-        public Event GetEventById(Guid id)
+        public EventDto GetEventById(Guid id)
         {
-            return _repository.GetById(id);
+            return _repository.GetById(id).ToDto();
         }
 
         /// <summary>
