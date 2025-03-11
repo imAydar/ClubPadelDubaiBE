@@ -16,7 +16,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowVueApp",
-        policy => policy.AllowAnyOrigin()//.WithOrigins("http://localhost:3000", "https://5023-94-204-215-144.ngrok-free.app", "https://black-dune-0dbad6403.4.azurestaticapps.net/")
+        policy => policy.WithOrigins("http://localhost:3000", "https://5023-94-204-215-144.ngrok-free.app", "https://black-dune-0dbad6403.4.azurestaticapps.net/")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .SetIsOriginAllowed(origin => true));
