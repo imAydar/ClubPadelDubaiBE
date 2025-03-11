@@ -2,7 +2,10 @@
 using ClubPadel.DL.EfCore;
 using ClubPadel.Models;
 using ClubPadel.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,9 +16,31 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowVueApp",
-        policy => policy.WithOrigins("http://localhost:3000", "https://7880-18-216-133-68.ngrok-free.app", "https://black-dune-0dbad6403.4.azurestaticapps.net/")
+        policy => policy.AllowAnyOrigin()//.WithOrigins("http://localhost:3000", "https://5023-94-204-215-144.ngrok-free.app", "https://black-dune-0dbad6403.4.azurestaticapps.net/")
                         .AllowAnyMethod()
-                        .AllowAnyHeader());
+                        .AllowAnyHeader()
+                        .SetIsOriginAllowed(origin => true));
+});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            //ValidIssuer = "your-issuer",
+            //ValidAudience = "your-audience",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("TgBotToken")))
+        };
+        options.TokenValidationParameters.ValidateIssuer = false;
+        options.TokenValidationParameters.ValidateAudience = false;
+    });
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("admin"));
 });
 
 
@@ -45,7 +70,8 @@ if (string.IsNullOrEmpty(connectionString))
 
 // Register EF Core with SQL Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString), ServiceLifetime.Scoped);
+    //options.UseSqlServer(connectionString), ServiceLifetime.Scoped);
+    options.UseNpgsql(connectionString), ServiceLifetime.Scoped);
 
 
 
@@ -59,6 +85,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

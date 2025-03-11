@@ -1,5 +1,6 @@
 ﻿//using ClubPadel.Services.ClubPadel.TelegramBot;
 using ClubPadel.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using Telegram.Bot;
@@ -24,5 +25,12 @@ namespace ClubPadel.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "admin")]
+        [HttpGet]
+        [Route("perm")]
+        public async Task<IActionResult> HandleWebhook()
+        {
+            return Ok();
+        }
     }
 }

@@ -1,5 +1,21 @@
 [
   {
+    "ContainingType": "ClubPadel.Controllers.AuthController",
+    "Method": "Authenticate",
+    "RelativePath": "api/auth/telegram",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "ClubPadel.Controllers.TelegramInitDataRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "ClubPadel.Controllers.EventsController",
     "Method": "Create",
     "RelativePath": "api/Events",
@@ -102,6 +118,16 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ClubPadel.Controllers.TelegramController",
+    "Method": "HandleWebhook",
+    "RelativePath": "api/telegram/perm",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {

@@ -154,6 +154,7 @@ namespace ClubPadel.Services
         /// </summary>
         public async Task<Event> Create(Event eventItem)
         {
+            eventItem.Date = eventItem.Date.ToUniversalTime();
             var message = GetHeaderText(eventItem);
             message.AppendLine("No participants yet.");
             var inlineKeyboard = new InlineKeyboardMarkup(new[]
@@ -164,7 +165,7 @@ namespace ClubPadel.Services
                     InlineKeyboardButton.WithCallbackData("Exit Event", "exit_event")
                 }
             });
-        
+            
             var sentMessage = await _telegramBotClient.SendMessage(
                     chatId: ChatId,
                     text: EscapeMarkdown(message.ToString()),

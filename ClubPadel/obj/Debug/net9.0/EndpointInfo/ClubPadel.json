@@ -5,6 +5,37 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/auth/telegram": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelegramInitDataRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelegramInitDataRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelegramInitDataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/Events": {
       "post": {
         "tags": [
@@ -221,6 +252,18 @@
         }
       }
     },
+    "/api/telegram/perm": {
+      "get": {
+        "tags": [
+          "Telegram"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/WeatherForecast": {
       "get": {
         "tags": [
@@ -340,6 +383,16 @@
           },
           "isOnWaitList": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TelegramInitDataRequest": {
+        "type": "object",
+        "properties": {
+          "initData": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

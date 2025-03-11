@@ -19,20 +19,18 @@ namespace ClubPadel.DL.EfCore
         {
             base.OnModelCreating(modelBuilder);
 
-            // ✅ Define Primary Keys
-            modelBuilder.Entity<User>().HasKey(u => u.Id);
-            modelBuilder.Entity<Role>().HasKey(r => r.Id);
-            modelBuilder.Entity<Event>().HasKey(e => e.Id);
-            modelBuilder.Entity<Participant>().HasKey(p => p.Id);
-            modelBuilder.Entity<Location>().HasKey(l => l.Id);
+            //modelBuilder.Entity<Event>()
+            //    .HasOne(e => e.Location)
+            //    .WithOne(l => l.Event)
+            //    .HasForeignKey<Location>(l => l.EventId)
+            //    .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Participant>()
                 .HasOne(p => p.Event)
                 .WithMany(e => e.Participants)
                 .HasForeignKey(p => p.EventId)
-                .OnDelete(DeleteBehavior.Cascade);  // ✅ Ensure proper foreign key constraint
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // Configure Many-to-Many Relationship (User <-> Roles)
             modelBuilder.Entity<UserRoles>()
                 .HasKey(ur => new { ur.UserId, ur.RoleId });
 
@@ -48,17 +46,64 @@ namespace ClubPadel.DL.EfCore
                 .HasForeignKey(ur => ur.RoleId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // One-to-One Relationship (Event -> Location)
-            modelBuilder.Entity<Location>()
-                .HasOne(l => l.Event)
-                .WithMany()
-                .HasForeignKey(l => l.EventId)
-                .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.HasPostgresExtension("uuid-ossp"); // Recommended for uuid generation
 
-            // Indexes for Performance
-            modelBuilder.Entity<Event>().HasIndex(e => e.Date);
-            modelBuilder.Entity<Location>().HasIndex(l => new { l.Latitude, l.Longitude }).IsUnique();
+            //foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            //{
+            //    foreach (var property in entityType.GetProperties())
+            //    {
+            //        if (property.ClrType == typeof(Guid))
+            //        {
+            //            property.SetColumnType("uuid");
+            //        }
+            //    }
+            //}
         }
+
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    base.OnModelCreating(modelBuilder);
+
+        //    // ✅ Define Primary Keys
+        //    modelBuilder.Entity<User>().HasKey(u => u.Id);
+        //    modelBuilder.Entity<Role>().HasKey(r => r.Id);
+        //    modelBuilder.Entity<Event>().HasKey(e => e.Id);
+        //    modelBuilder.Entity<Participant>().HasKey(p => p.Id);
+        //    modelBuilder.Entity<Location>().HasKey(l => l.Id);
+
+        //    modelBuilder.Entity<Participant>()
+        //        .HasOne(p => p.Event)
+        //        .WithMany(e => e.Participants)
+        //        .HasForeignKey(p => p.EventId)
+        //        .OnDelete(DeleteBehavior.Cascade);  // ✅ Ensure proper foreign key constraint
+
+        //    // Configure Many-to-Many Relationship (User <-> Roles)
+        //    modelBuilder.Entity<UserRoles>()
+        //        .HasKey(ur => new { ur.UserId, ur.RoleId });
+
+        //    modelBuilder.Entity<UserRoles>()
+        //        .HasOne(ur => ur.User)
+        //        .WithMany(u => u.UserRoles)
+        //        .HasForeignKey(ur => ur.UserId)
+        //        .OnDelete(DeleteBehavior.Cascade);
+
+        //    modelBuilder.Entity<UserRoles>()
+        //        .HasOne(ur => ur.Role)
+        //        .WithMany(r => r.UserRoles)
+        //        .HasForeignKey(ur => ur.RoleId)
+        //        .OnDelete(DeleteBehavior.Cascade);
+
+        //    modelBuilder.Entity<Location>()
+        //        .HasOne(l => l.Event)
+        //        .WithOne(e => e.Location) // <-- Should be WithOne()
+        //        .HasForeignKey<Location>(l => l.EventId)
+        //        .OnDelete(DeleteBehavior.Cascade);
+
+
+        //    // Indexes for Performance
+        //    modelBuilder.Entity<Event>().HasIndex(e => e.Date);
+        //    modelBuilder.Entity<Location>().HasIndex(l => new { l.Latitude, l.Longitude }).IsUnique();
+        //}
 
     }
 

@@ -10,6 +10,8 @@ namespace ClubPadel.Models
         public DateTimeOffset Date { get; set; }
         public string Time { get; set; }
         public string Location { get; set; }
+        //public Location? Location { get; set; }
+        //public Guid? LocationId { get; set; }
         public bool IsOnWaitList { get; set; }
 
         public virtual List<Participant> Participants { get; set; } = new List<Participant>();

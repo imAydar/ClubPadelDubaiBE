@@ -9,7 +9,7 @@ namespace ClubPadel.Extensions
         {
             Date = item.Date,
             Id = item.Id,
-            Location = item.Location,
+            Location = item.Location.ToString(),
             Name = item.Name,
             Time = item.Time,
             Participants = [.. item.Participants.Where(p => !p.IsOnWaitList).OrderBy(p => p.CreatedAt).Select(p => p.ToDto())],

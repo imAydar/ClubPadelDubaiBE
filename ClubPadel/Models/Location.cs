@@ -9,7 +9,7 @@ namespace ClubPadel.Models
         public double Latitude { get; set; }
         public double Longitude { get; set; }
 
-        public Event Event { get; internal set; }
-        public Guid EventId { get; internal set; }
+        public Guid EventId { get; set; }
+        public Event Event { get; set; }
     }
 }

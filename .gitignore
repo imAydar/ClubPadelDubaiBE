@@ -1,60 +1,81 @@
-# 🏗 Build Artifacts
+# 🟢 Build & Compiled Files
 bin/
 obj/
-*.exe
 *.dll
+*.exe
 *.pdb
 *.cache
-*.ilk
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
-*.nupkg
-*.snupkg
-*.psess
+*.log
 
-# 📦 NuGet Packages
-packages/
-!packages/repositories.config
+# 🟢 NuGet Packages
 *.nupkg
+packages/
+.nuget/
 project.lock.json
 project.assets.json
-PackageReference.cache
-.vs/
 
-# 🔧 Configuration & Logs
-*.config
-*.log
-*.tlog
-*.lastcodeanalysissucceeded
-appsettings.json
-appsettings.Development.json
-secrets.json
+# 🟢 User-Specific Files (VS, VS Code, Rider)
+.vscode/
+.idea/
+*.suo
+*.user
+*.rsuser
+*.sln.cache
+*.vs/
+*.ncrunch*
+*.nvuser
 
-# 🏛 Entity Framework Migrations
+# 🟢 Entity Framework Migrations
 Migrations/
 
-# 🖥 Rider & VS Code
-.idea/
-.vscode/
-.vscode/*
-
-# 🛠 Resharper & Rider Files
-*.DotSettings.user
-resharper.xml
-
-# 🔐 User Secrets
-secrets.json
-*.key
-
-# 🛠 Global Tools & Dependency Files
-.nuget/
+# 🟢 ASP.NET / Blazor Generated Files
+wwwroot/
 node_modules/
 dist/
-out/
+bower_components/
 
-# 🚀 Docker & Deployment
+# 🟢 Configuration / Secrets
+appsettings.json
+appsettings.Development.json
+appsettings.Local.json
+appsettings.Production.json
+secrets.json
+
+# 🟢 Logs & Debugging
+logs/
+*.log
+*.tlog
+*.cache
+*.pid
+*.bak
+
+# 🟢 Resharper / JetBrains Rider
+*.DotSettings.user
+.idea/
+resharper.xml
+
+# 🟢 Rider & VS Code settings
+.vscode/
+.idea/
+.vs/
+
+# 🟢 Docker & CI/CD
 Dockerfile
-docker-compose*
-.env
+docker-compose.yml
+.dockerignore
+
+# 🟢 System & OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# 🟢 Other IDE Configs
+*.sln.ide
+*.sln.iml
+*.sln.cache
+*.vscode/
+
+# 🟢 Generated Documentation
+*.xml
+docfx/
