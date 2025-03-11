@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ClubPadel")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9c3ffad57188c22cd7231a8301998a5c3c4ccb30")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7155271f8468042d568f75d02f0e9f7546c27664")]
 [assembly: System.Reflection.AssemblyProductAttribute("ClubPadel")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ClubPadel")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

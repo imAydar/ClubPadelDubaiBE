@@ -174,4 +174,3 @@ C:\Work\git\ClubPadel\ClubPadel\obj\Debug\net9.0\refint\ClubPadel.dll
 C:\Work\git\ClubPadel\ClubPadel\obj\Debug\net9.0\ClubPadel.pdb
 C:\Work\git\ClubPadel\ClubPadel\obj\Debug\net9.0\ClubPadel.genruntimeconfig.cache
 C:\Work\git\ClubPadel\ClubPadel\obj\Debug\net9.0\ref\ClubPadel.dll
-C:\Work\git\ClubPadel\ClubPadel\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
