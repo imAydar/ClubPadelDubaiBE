@@ -209,13 +209,12 @@ namespace ClubPadel.Services
 
         public async Task RemoveParticipant(int messageId, string? userName)
         {
-            var eventItem = _repository.GetAll().First(e => e.TelegramMessageId == messageId);
+            var eventItem = _repository.GetByMessageId(messageId);
             var user = eventItem.Participants.FirstOrDefault(p => p.UserName == userName); //?? eventItem.Waitlist.FirstOrDefault(p => p.UserName == userName);
 
-            _log.LogInformation($"MessageId: {messageId}, userName:{userName}");
             if (user == null)
             {
-                _log.LogError($"Couldnt find the user with userName:{userName} in event with messageId {messageId}");
+                _log.LogError($"Couldnt find the user with userName:{userName} in event eventId: {eventItem.Id} with messageId {messageId}");
             }
             await RemoveParticipant(eventItem.Id, user.Id);
         }

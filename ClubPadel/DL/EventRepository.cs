@@ -25,8 +25,15 @@ namespace ClubPadel.DL
                 .Include(e => e.Participants)
                 .FirstOrDefault(e => e.Id == id);
             @event.Participants.OrderBy(p => p.CreatedAt);
-            var isTracked = _context.ChangeTracker.Entries<Event>().Any(e => e.Entity.Id == id);
-            Console.WriteLine($"Is event tracked? {isTracked}");
+            return @event;
+        }
+
+        public Event GetByMessageId(int messageId)
+        {
+            var @event = _context.Events
+                .Include(e => e.Participants)
+                .FirstOrDefault(e => e.TelegramMessageId == messageId);
+            @event.Participants.OrderBy(p => p.CreatedAt);
             return @event;
         }
     }
