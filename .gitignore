@@ -1,6 +1,9 @@
 # 🟢 Build & Compiled Files
 bin/
 obj/
+[Bb]uild/
+[Dd]ebug*/
+[Rr]elease*/
 *.dll
 *.exe
 *.pdb
@@ -24,9 +27,6 @@ project.assets.json
 *.vs/
 *.ncrunch*
 *.nvuser
-
-# 🟢 Entity Framework Migrations
-Migrations/
 
 # 🟢 ASP.NET / Blazor Generated Files
 wwwroot/

@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace ClubPadel.Models
+﻿namespace ClubPadel.Models
 {
     public class Event : EntityBase
     {
@@ -12,8 +9,13 @@ namespace ClubPadel.Models
         public string Location { get; set; }
         //public Location? Location { get; set; }
         //public Guid? LocationId { get; set; }
-        public bool IsOnWaitList { get; set; }
 
-        public virtual List<Participant> Participants { get; set; } = new List<Participant>();
+        public decimal? Price { get; set; }
+        public string? Level { get; set; }
+        public TimeSpan? Duration { get; set; }
+        public DateTimeOffset? SendAt { get; set; }
+        public bool? IsOnHold { get; set; }
+
+        public virtual List<Participant> Participants { get; set; } = [];
     }
 }

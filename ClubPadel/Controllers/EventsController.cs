@@ -57,15 +57,6 @@ namespace ClubPadel.Controllers
         [HttpPost("{id}/participants")]
         public async Task<IActionResult> AddParticipant(Guid id, [FromBody] Participant participant)
         {
-            //_eventService.AddParticipant(id, participant);
-            //return Ok();
-            //var participant = new Participant
-            //{
-            //    UserName = participantName,
-            //    Name = participantName,
-            //    Confirmed = false
-            //};
-
             await _eventService.AddParticipant(id, participant);
             return Ok();
         }
@@ -80,11 +71,6 @@ namespace ClubPadel.Controllers
         [HttpDelete("{id}/participants")]
         public async Task<IActionResult> RemoveParticipant(Guid id, [FromBody] Guid participanId)
         {
-            //if (!Guid.TryParse(participanId, out Guid participantGuid))
-            //{
-            //    return BadRequest("Invalid participantId format.");
-            //}
-
             await _eventService.RemoveParticipant(id, participanId);
             return Ok();
         }

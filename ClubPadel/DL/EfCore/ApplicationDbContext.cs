@@ -64,7 +64,6 @@ namespace ClubPadel.DL.EfCore
         //{
         //    base.OnModelCreating(modelBuilder);
 
-        //    // ✅ Define Primary Keys
         //    modelBuilder.Entity<User>().HasKey(u => u.Id);
         //    modelBuilder.Entity<Role>().HasKey(r => r.Id);
         //    modelBuilder.Entity<Event>().HasKey(e => e.Id);
