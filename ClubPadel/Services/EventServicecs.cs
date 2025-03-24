@@ -190,6 +190,8 @@ namespace ClubPadel.Services
         public async Task<Event> Create(Event eventItem)
         {
             eventItem.Date = eventItem.Date.ToUniversalTime();
+            eventItem.SendAt = eventItem.SendAt?.ToUniversalTime();
+
             var message = GetHeaderText(eventItem);
             message.AppendLine("No participants yet.");
             var inlineKeyboard = new InlineKeyboardMarkup(new[]
