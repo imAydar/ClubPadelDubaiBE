@@ -20,11 +20,16 @@ namespace ClubPadel.Services
         private readonly EventSqlRepository _repository;
         private readonly ParticipantSqlRepository _participantRepository;
 
-        public EventService(ITelegramBotClient telegramBotClient, EventSqlRepository repository, ParticipantSqlRepository participantRepository)
+        private readonly ILogger<EventService> _log;
+
+        public EventService(ITelegramBotClient telegramBotClient, EventSqlRepository repository, 
+            ParticipantSqlRepository participantRepository, ILogger<EventService> log)
         {
             _telegramBotClient = telegramBotClient ?? throw new ArgumentNullException(nameof(telegramBotClient));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _participantRepository = participantRepository;
+
+            _log = log;
         }
 
         public async Task AddParticipant(int messageId, string userName)
@@ -207,6 +212,11 @@ namespace ClubPadel.Services
             var eventItem = _repository.GetAll().First(e => e.TelegramMessageId == messageId);
             var user = eventItem.Participants.FirstOrDefault(p => p.UserName == userName); //?? eventItem.Waitlist.FirstOrDefault(p => p.UserName == userName);
 
+            _log.LogInformation($"MessageId: {messageId}, userName:{userName}");
+            if (user == null)
+            {
+                _log.LogError($"Couldnt find the user with userName:{userName} in event with messageId {messageId}");
+            }
             await RemoveParticipant(eventItem.Id, user.Id);
         }
 
