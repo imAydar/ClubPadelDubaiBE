@@ -22,7 +22,7 @@ namespace ClubPadel.Services
 
         private readonly ILogger<EventService> _log;
 
-        public EventService(ITelegramBotClient telegramBotClient, EventSqlRepository repository, 
+        public EventService(ITelegramBotClient telegramBotClient, EventSqlRepository repository,
             ParticipantSqlRepository participantRepository, ILogger<EventService> log)
         {
             _telegramBotClient = telegramBotClient ?? throw new ArgumentNullException(nameof(telegramBotClient));
@@ -34,7 +34,7 @@ namespace ClubPadel.Services
 
         public async Task AddParticipant(int messageId, string userName)
         {
-            var eventId = _repository.GetAll().First(e => e.TelegramMessageId == messageId).Id;
+            var eventId = _repository.GetByMessageId(messageId).Id;
             var participant = new Participant()
             {
                 Id = Guid.NewGuid(),
@@ -60,7 +60,7 @@ namespace ClubPadel.Services
 
             // Check if the user is already a participant
             var isAlreadyParticipant = eventItem.Participants.Any(p => p.Name == participant.Name);
-                                   //    eventItem.Waitlist.Any(p => p.Name == participant.Name);
+            //    eventItem.Waitlist.Any(p => p.Name == participant.Name);
 
             if (!isAlreadyParticipant)
             {
@@ -88,12 +88,8 @@ namespace ClubPadel.Services
             var message = GetHeaderText(eventItem);
 
             var players = eventItem.Participants
-                .Where(p => p.IsOnWaitList)
                 .OrderBy(p => p.CreatedAt)
-                .ToList();
-            var waitlist = eventItem.Participants
-                .Except(players)
-                .OrderBy(p => p.CreatedAt)
+                .Take(eventItem.MaxParticipants)
                 .ToList();
 
             if (players?.Count == 0)
@@ -106,18 +102,26 @@ namespace ClubPadel.Services
                 {
                     var participant = players[i];
                     var confirmed = participant.Confirmed ? "✅" : "⏳";
-                    message.AppendLine($"{i + 1}. {participant.Name} {confirmed}");
+                    message.AppendLine($"🎾{i + 1}. {participant.Name} {confirmed}");
                 }
             }
 
-            if (waitlist?.Count > 0)
+            if (eventItem.Participants.Count > eventItem.MaxParticipants)
             {
-                message.AppendLine("\n📌 Waitlist:");
-                for (int i = 0; i < waitlist.Count; i++)
+                var waitlist = eventItem.Participants
+                    .Except(players)
+                    .OrderBy(p => p.CreatedAt)
+                    .ToList();
+
+                if (waitlist?.Count > 0)
                 {
-                    var participant = waitlist[i];
-                    var confirmed = participant.Confirmed ? "✅" : "⏳";
-                    message.AppendLine($"{i + 1}. {participant.Name} {confirmed}");
+                    message.AppendLine("\n📌 Waitlist:");
+                    for (int i = 0; i < waitlist.Count; i++)
+                    {
+                        var participant = waitlist[i];
+                        var confirmed = participant.Confirmed ? "✅" : "⏳";
+                        message.AppendLine($"{i + 1}. {participant.Name} {confirmed}");
+                    }
                 }
             }
 
@@ -147,13 +151,39 @@ namespace ClubPadel.Services
         private static StringBuilder GetHeaderText(Event eventItem)
         {
             var message = new StringBuilder();
+            message.AppendLine($"🎾 Присоединяйтесь к игре!");
             message.AppendLine($"🎾 {eventItem.Name}\n");
-            message.AppendLine($"📅 {eventItem.Date.DateTime.ToShortDateString()} at {eventItem.Time}");
-            message.AppendLine($"📍 {eventItem.Location}\n");
+            message.AppendLine($"📅 {eventItem.Date.DateTime.ToShortDateString()}");
+            if (eventItem.Duration.HasValue)
+            {
+                var duration = GetTimeText(eventItem.Date, eventItem.Duration.Value);
+                message.AppendLine(duration);
+            }
+            message.AppendLine($"📍 {eventItem.Location}");
+            if (eventItem.Price != null)
+            {
+                message.AppendLine($"💰 {eventItem.Price.ToString()} AED | оплата перед игрой на ресепшен\n");
+            }
+            if (eventItem.MaxParticipants > 0)
+            {
+                message.AppendLine($"Доступно мест {eventItem.MaxParticipants - (eventItem.GetParticipantsCount())} из {eventItem.MaxParticipants}\n");
+            }
             message.AppendLine("👥 Participants:");
             return message;
         }
 
+        private static string GetTimeText(DateTimeOffset date, TimeSpan duration)
+        {
+            DateTimeOffset end = date + duration;
+
+            double hours = duration.TotalHours;
+            string formattedHours = hours % 1 == 0
+                ? $"{(int)hours} час{(hours == 1 ? "" : "а")}"
+                : $"{hours:0.##} часа"; // You can localize this more precisely if needed
+
+            string message = $"{date:HH:mm}–{end:HH:mm} ({formattedHours})";
+            return message;
+        }
         /// <summary>
         /// Creates a new event and sends a Telegram message.
         /// </summary>
@@ -170,7 +200,7 @@ namespace ClubPadel.Services
                     InlineKeyboardButton.WithCallbackData("Exit Event", "exit_event")
                 }
             });
-            
+
             var sentMessage = await _telegramBotClient.SendMessage(
                     chatId: ChatId,
                     text: EscapeMarkdown(message.ToString()),

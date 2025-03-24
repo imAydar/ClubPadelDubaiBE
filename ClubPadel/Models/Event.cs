@@ -14,8 +14,14 @@
         public string? Level { get; set; }
         public TimeSpan? Duration { get; set; }
         public DateTimeOffset? SendAt { get; set; }
-        public bool? IsOnHold { get; set; }
+        public bool IsOnHold { get; set; }
+        public int MaxParticipants { get; set; }
 
         public virtual List<Participant> Participants { get; set; } = [];
+
+        public int GetParticipantsCount()
+        {
+            return Participants.Count > MaxParticipants ? MaxParticipants : Participants.Count;
+        }
     }
 }
