@@ -18,8 +18,8 @@ namespace ClubPadel.Extensions
             SendAt = item.SendAt,
             IsOnHold = item.IsOnHold,
             MaxParticipants = item.MaxParticipants,
-            Participants = [.. item.Participants.Where(p => !p.IsOnWaitList).OrderBy(p => p.CreatedAt).Select(p => p.ToDto())],
-            Waitlist = [.. item.Participants.Where(p => p.IsOnWaitList).OrderBy(p => p.CreatedAt).Select(p => p.ToDto())],
+            Participants = [.. item.Participants.Take(item.MaxParticipants).OrderBy(p => p.CreatedAt).Select(p => p.ToDto())],
+            Waitlist = [.. item.Participants.Skip(item.MaxParticipants).OrderBy(p => p.CreatedAt).Select(p => p.ToDto())],
             TelegramMessageId = item.TelegramMessageId
         };
 

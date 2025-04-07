@@ -105,14 +105,26 @@ namespace ClubPadel.Services
             //    latitude: 0,
             //    longitude: 0
             //);
-            await _telegramBotClient.EditMessageText(
-                chatId: chatId,
-                messageId: eventItem.TelegramMessageId,
-                text: EscapeMarkdown(message.ToString()),
-                parseMode: ParseMode.MarkdownV2,
-                default, default,
-                replyMarkup: inlineKeyboard
-            );
+            try
+            {
+                await _telegramBotClient.EditMessageText(
+                    chatId: chatId,
+                    messageId: eventItem.TelegramMessageId,
+                    text: EscapeMarkdown(message.ToString()),
+                    parseMode: ParseMode.MarkdownV2,
+                    default, default,
+                    replyMarkup: inlineKeyboard
+                );
+            }
+            catch (Exception ex)
+            {
+                if (!ex.Message.Contains("there is no text in the message to edit") &&
+                    !ex.Message.Contains("message is not modified"))
+                {
+                    throw;
+                }
+            }
+
         }
 
         private static StringBuilder SetParticipants(Event eventItem, StringBuilder message)
