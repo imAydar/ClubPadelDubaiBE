@@ -71,7 +71,7 @@ namespace ClubPadel.Services
 
                 participant.EventId = eventId;
                 //eventItem.Participants.Add(participant);
-                _participantRepository.Upsert(participant);
+                await _participantRepository.Upsert(participant);
             }
             else
             {
@@ -275,8 +275,11 @@ namespace ClubPadel.Services
 
             if (user == null)
             {
+                Console.WriteLine($"Couldnt find the user with userName:{userName} in event eventId: {eventItem.Id} with messageId {messageId}");
                 _log.LogError($"Couldnt find the user with userName:{userName} in event eventId: {eventItem.Id} with messageId {messageId}");
+                return;
             }
+            Console.WriteLine($"eventId: {eventItem.Id} with userId {user.Id}");
             await RemoveParticipant(eventItem.Id, user.Id);
         }
 
