@@ -59,10 +59,10 @@ namespace ClubPadel.Services
             }
 
             // Check if the user is already a participant
-            var isAlreadyParticipant = eventItem.Participants.Any(p => p.Name == participant.Name);
+            var participantEntity = eventItem.Participants.FirstOrDefault(p => p.Name == participant.Name);
             //    eventItem.Waitlist.Any(p => p.Name == participant.Name);
 
-            if (!isAlreadyParticipant)
+            if (participantEntity == null && participantEntity.Confirmed != participant.Confirmed)
             {
                 if (eventItem.Participants.Count >= MaxParticipants)
                 {
