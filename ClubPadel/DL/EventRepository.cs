@@ -42,6 +42,35 @@ namespace ClubPadel.DL
     {
         public ParticipantSqlRepository(ApplicationDbContext context) : base(context)
         {
+            
+        }
+
+        public async Task Upsert(Participant participant)
+        {
+            var entity = await _context.Participants.FirstOrDefaultAsync(p => p.UserName == participant.UserName);
+
+            if (entity != null)
+            {
+                entity = participant;
+                _dbSet.Update(participant);
+            }
+            else
+            {
+                _dbSet.Add(participant);
+            }
+
+            _context.SaveChanges();
+        }
+
+        public async Task SaveUser(User user)
+        {
+            var userEntity = await _context.Users.FirstOrDefaultAsync(u => u.UserName == user.UserName);
+            if (userEntity == null)
+            {
+                user.Id = Guid.NewGuid();
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

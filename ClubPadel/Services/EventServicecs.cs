@@ -71,7 +71,7 @@ namespace ClubPadel.Services
 
                 participant.EventId = eventId;
                 //eventItem.Participants.Add(participant);
-                _participantRepository.Save(participant);
+                _participantRepository.Upsert(participant);
             }
             else
             {
