@@ -58,7 +58,6 @@ namespace ClubPadel.DL
                 entity.IsOnWaitList = participant.IsOnWaitList;
                 entity.UserName = participant.UserName;
                 entity.EventId = participant.EventId;
-                entity.Id = participant.Id;
                 // etc.
                 _dbSet.Update(entity);
             }
