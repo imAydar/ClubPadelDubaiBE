@@ -87,6 +87,36 @@ namespace ClubPadel.Services
         {
             var message = GetHeaderText(eventItem);
 
+            message = SetParticipants(eventItem, message);
+
+            var inlineKeyboard = new InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton.WithCallbackData("Записаться ⏳", "join_event"),
+                    InlineKeyboardButton.WithCallbackData("Записаться ✅", "join_event_confirmed")
+                ],
+                [
+                    InlineKeyboardButton.WithCallbackData("Освободить место ❌", "exit_event")
+                ]
+            ]);
+
+            var chatId = new ChatId(ChatId);
+            //var locationMessage = await _telegramBotClient.SendLocation(
+            //    chatId: chatId,
+            //    latitude: 0,
+            //    longitude: 0
+            //);
+            await _telegramBotClient.EditMessageText(
+                chatId: chatId,
+                messageId: eventItem.TelegramMessageId,
+                text: EscapeMarkdown(message.ToString()),
+                parseMode: ParseMode.MarkdownV2,
+                default, default,
+                replyMarkup: inlineKeyboard
+            );
+        }
+
+        private static StringBuilder SetParticipants(Event eventItem, StringBuilder message)
+        {
             var players = eventItem.Participants
                 .OrderBy(p => p.CreatedAt)
                 .Take(eventItem.MaxParticipants)
@@ -124,31 +154,7 @@ namespace ClubPadel.Services
                     }
                 }
             }
-
-            var inlineKeyboard = new InlineKeyboardMarkup([
-                [
-                    InlineKeyboardButton.WithCallbackData("Записаться ⏳", "join_event"),
-                    InlineKeyboardButton.WithCallbackData("Записаться ✅", "join_event_confirmed")
-                ],
-                [
-                    InlineKeyboardButton.WithCallbackData("Освободить место ❌", "exit_event")
-                ]
-            ]);
-
-            var chatId = new ChatId(ChatId);
-            //var locationMessage = await _telegramBotClient.SendLocation(
-            //    chatId: chatId,
-            //    latitude: 0,
-            //    longitude: 0
-            //);
-            await _telegramBotClient.EditMessageText(
-                chatId: chatId,
-                messageId: eventItem.TelegramMessageId,
-                text: EscapeMarkdown(message.ToString()),
-                parseMode: ParseMode.MarkdownV2,
-                default, default,
-                replyMarkup: inlineKeyboard
-            );
+            return message;
         }
 
         private static StringBuilder GetHeaderText(Event eventItem)
@@ -190,21 +196,23 @@ namespace ClubPadel.Services
         /// <summary>
         /// Creates a new event and sends a Telegram message.
         /// </summary>
-        public async Task<Event> Create(Event eventItem)
+        public async Task<EventDto> Create(EventDto eventDto)
         {
+            var eventItem = eventDto.ToEntity();
             eventItem.Date = eventItem.Date.ToUniversalTime();
             eventItem.SendAt = eventItem.SendAt?.ToUniversalTime();
 
             var message = GetHeaderText(eventItem);
-            message.AppendLine("No participants yet.");
-            var inlineKeyboard = new InlineKeyboardMarkup(new[]
-            {
-                new[]
-                {
-                    InlineKeyboardButton.WithCallbackData("❤️ Join Event", "join_event"),
-                    InlineKeyboardButton.WithCallbackData("Exit Event", "exit_event")
-                }
-            });
+            message = SetParticipants(eventItem, message);
+            var inlineKeyboard = new InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton.WithCallbackData("Записаться ⏳", "join_event"),
+                    InlineKeyboardButton.WithCallbackData("Записаться ✅", "join_event_confirmed")
+                ],
+                [
+                    InlineKeyboardButton.WithCallbackData("Освободить место ❌", "exit_event")
+                ]
+            ]);
 
             var sentMessage = await _telegramBotClient.SendMessage(
                     chatId: ChatId,
@@ -219,7 +227,13 @@ namespace ClubPadel.Services
             // Save the event to the repository
             _repository.Save(eventItem);
 
-            return eventItem;
+            return eventItem.ToDto();
+        }
+
+        public async Task AddParticipant(Guid eventId, ParticipantDto participantDto)
+        {
+            var participant = participantDto.ToEntity();
+            await AddParticipant(eventId, participant);
         }
 
         /// <summary>

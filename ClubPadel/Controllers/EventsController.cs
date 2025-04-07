@@ -1,5 +1,6 @@
 ﻿using ClubPadel.Models;
 using ClubPadel.Services;
+using ClubPadel.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +20,7 @@ namespace ClubPadel.Controllers
 
         //[Authorize(Roles = "admin")]
         [HttpPost]
-        public async Task<IActionResult> Create(Event param)
+        public async Task<IActionResult> Create(EventDto param)
         {
             return Ok(await _eventService.Create(param));
         }
@@ -55,7 +56,7 @@ namespace ClubPadel.Controllers
         }
 
         [HttpPost("{id}/participants")]
-        public async Task<IActionResult> AddParticipant(Guid id, [FromBody] Participant participant)
+        public async Task<IActionResult> AddParticipant(Guid id, [FromBody] ParticipantDto participant)
         {
             await _eventService.AddParticipant(id, participant);
             return Ok();
