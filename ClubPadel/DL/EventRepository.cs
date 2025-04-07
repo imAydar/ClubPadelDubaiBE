@@ -47,7 +47,7 @@ namespace ClubPadel.DL
 
         public async Task Upsert(Participant participant)
         {
-            var entity = await _context.Participants.FirstOrDefaultAsync(p => p.UserName == participant.UserName);
+            var entity = await _context.Participants.FirstOrDefaultAsync(p => p.UserName == participant.UserName && p.EventId == participant.EventId);
 
             if (entity != null)
             {
