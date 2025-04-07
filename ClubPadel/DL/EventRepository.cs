@@ -47,19 +47,41 @@ namespace ClubPadel.DL
 
         public async Task Upsert(Participant participant)
         {
-            var entity = await _context.Participants.FirstOrDefaultAsync(p => p.UserName == participant.UserName && p.EventId == participant.EventId);
+            var entity = await _context.Participants
+                .FirstOrDefaultAsync(p => p.UserName == participant.UserName && p.EventId == participant.EventId);
 
             if (entity != null)
             {
-                entity = participant;
-                _dbSet.Update(participant);
+                // Update only needed fields
+                entity.Name = participant.Name;
+                entity.Confirmed = participant.Confirmed;
+                entity.IsOnWaitList = participant.IsOnWaitList;
+                entity.UserName = participant.UserName;
+                entity.EventId = participant.EventId;
+                //entity.Id = participant.Id;
+                // etc.
+                _dbSet.Update(entity);
             }
             else
             {
                 _dbSet.Add(participant);
             }
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
+            //var entity = await _context.Participants.FirstOrDefaultAsync(p => p.UserName == participant.UserName && p.EventId == participant.EventId);
+
+            //if (entity != null)
+            //{
+            //    entity = participant;
+            //    _dbSet.Update(participant);
+            //}
+            //else
+            //{
+            //    _dbSet.Add(participant);
+            //}
+
+            //_context.SaveChanges();
         }
 
         public async Task SaveUser(User user)
