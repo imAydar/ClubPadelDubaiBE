@@ -49,7 +49,7 @@ namespace ClubPadel.DL
         {
             var entity = await _context.Participants
                 .FirstOrDefaultAsync(p => p.UserName == participant.UserName && p.EventId == participant.EventId);
-            Console.WriteLine(participant.Confirmed + "___________________" + entity.Confirmed);
+
             if (entity != null)
             {
                 // Update only needed fields
@@ -66,22 +66,22 @@ namespace ClubPadel.DL
                 _dbSet.Add(participant);
             }
 
-            var changes = _context.ChangeTracker.Entries()
-    .Select(e => new
-    {
-        Entity = e.Entity.GetType().Name,
-        State = e.State,
-        Properties = e.Properties.Where(p => p.IsModified).Select(p => new { p.Metadata.Name, p.CurrentValue })
-    });
+    //        var changes = _context.ChangeTracker.Entries()
+    //.Select(e => new
+    //{
+    //    Entity = e.Entity.GetType().Name,
+    //    State = e.State,
+    //    Properties = e.Properties.Where(p => p.IsModified).Select(p => new { p.Metadata.Name, p.CurrentValue })
+    //});
 
-            foreach (var change in changes)
-            {
-                Console.WriteLine($"[EF] {change.Entity} - {change.State}");
-                foreach (var prop in change.Properties)
-                {
-                    Console.WriteLine($"  ↳ {prop.Name} = {prop.CurrentValue}");
-                }
-            }
+    //        foreach (var change in changes)
+    //        {
+    //            Console.WriteLine($"[EF] {change.Entity} - {change.State}");
+    //            foreach (var prop in change.Properties)
+    //            {
+    //                Console.WriteLine($"  ↳ {prop.Name} = {prop.CurrentValue}");
+    //            }
+    //        }
 
             await _context.SaveChangesAsync();
 
