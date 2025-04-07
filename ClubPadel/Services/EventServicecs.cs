@@ -110,7 +110,7 @@ namespace ClubPadel.Services
                 await _telegramBotClient.EditMessageText(
                     chatId: chatId,
                     messageId: eventItem.TelegramMessageId,
-                    text: EscapeMarkdown(message.ToString()),
+                    text: EscapeMarkdown(message.ToString() + "_changed"),
                     parseMode: ParseMode.MarkdownV2,
                     default, default,
                     replyMarkup: inlineKeyboard
