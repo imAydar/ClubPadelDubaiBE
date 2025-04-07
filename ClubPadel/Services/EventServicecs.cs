@@ -62,6 +62,7 @@ namespace ClubPadel.Services
             var participantEntity = eventItem.Participants.FirstOrDefault(p => p.Name == participant.Name);
             //    eventItem.Waitlist.Any(p => p.Name == participant.Name);
 
+            Console.WriteLine("dbg0101__" + participantEntity.Confirmed + "_" + participant.Confirmed);
             if (participantEntity == null && participantEntity?.Confirmed != participant.Confirmed)
             {
                 if (eventItem.Participants.Count >= MaxParticipants)
@@ -110,7 +111,7 @@ namespace ClubPadel.Services
                 await _telegramBotClient.EditMessageText(
                     chatId: chatId,
                     messageId: eventItem.TelegramMessageId,
-                    text: EscapeMarkdown(message.ToString() + "_changed"),
+                    text: EscapeMarkdown(message.ToString()),
                     parseMode: ParseMode.MarkdownV2,
                     default, default,
                     replyMarkup: inlineKeyboard
