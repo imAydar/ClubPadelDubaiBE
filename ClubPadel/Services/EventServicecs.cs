@@ -32,7 +32,7 @@ namespace ClubPadel.Services
             _log = log;
         }
 
-        public async Task AddParticipant(int messageId, string userName)
+        public async Task AddParticipant(int messageId, string userName, bool confirmed = false)
         {
             var eventId = _repository.GetByMessageId(messageId).Id;
             var participant = new Participant()
@@ -40,7 +40,7 @@ namespace ClubPadel.Services
                 Id = Guid.NewGuid(),
                 Name = userName,
                 UserName = userName,
-                Confirmed = false
+                Confirmed = confirmed
             };
             await AddParticipant(eventId, participant);
         }
@@ -127,8 +127,11 @@ namespace ClubPadel.Services
 
             var inlineKeyboard = new InlineKeyboardMarkup([
                 [
-                    InlineKeyboardButton.WithCallbackData("❤️ Join Event", "join_event"),
-                    InlineKeyboardButton.WithCallbackData("Exit Event", "exit_event")
+                    InlineKeyboardButton.WithCallbackData("Записаться ⏳", "join_event"),
+                    InlineKeyboardButton.WithCallbackData("Записаться ✅", "join_event_confirmed")
+                ],
+                [
+                    InlineKeyboardButton.WithCallbackData("Освободить место ❌", "exit_event")
                 ]
             ]);
 

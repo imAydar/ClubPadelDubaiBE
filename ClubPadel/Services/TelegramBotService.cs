@@ -81,6 +81,9 @@ namespace ClubPadel.Services
                 case "join_event":
                     await _eventService.AddParticipant(messageId, userName);
                     break;
+                case "join_event_confirmed":
+                    await _eventService.AddParticipant(messageId, userName, true);
+                    break;
                 case "exit_event":
                     await _eventService.RemoveParticipant(messageId, userName);
                     break;
@@ -187,6 +190,7 @@ namespace ClubPadel.Services
                     : "No likes yet.";
 
                 var text = $"🎾 New Event! Click ❤️ to like!\n\n👍 *Likes:* \n{likeList}";
+  
                 await _botClient.EditMessageText(chatId, (int)messageId, text, ParseMode.Markdown, replyMarkup: inlineKeyboard);
             }
             catch (Exception ex)
@@ -194,6 +198,25 @@ namespace ClubPadel.Services
                 Console.WriteLine($"Error updating message: {ex.Message}");
             }
         }
+
+        ////TODO: check if groupId != chatId(it definetely not, there could be channels)
+        //public async Task<bool> IsUserInGroup(ITelegramBotClient botClient, string username, long groupId)
+        //{
+        //    try
+        //    {
+        //        ChatMember member = await botClient.GetChatMemberCountAsync(groupId, username);
+        //        return member.Status != ChatMemberStatus.Left && member.Status != ChatMemberStatus.Kicked;
+        //    }
+        //    catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+        //    {
+        //        if (ex.Message.Contains("user not found"))
+        //        {
+        //            return false;
+        //        }
+
+        //        throw;
+        //    }
+        //}
     }
 
     public interface ITelegramBotService
