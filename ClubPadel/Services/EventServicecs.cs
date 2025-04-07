@@ -62,7 +62,7 @@ namespace ClubPadel.Services
             var participantEntity = eventItem.Participants.FirstOrDefault(p => p.Name == participant.Name);
             //    eventItem.Waitlist.Any(p => p.Name == participant.Name);
 
-            if (participantEntity == null && participantEntity.Confirmed != participant.Confirmed)
+            if (participantEntity == null && participantEntity?.Confirmed != participant.Confirmed)
             {
                 if (eventItem.Participants.Count >= MaxParticipants)
                 {
