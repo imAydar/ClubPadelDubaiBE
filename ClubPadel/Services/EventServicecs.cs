@@ -35,9 +35,8 @@ namespace ClubPadel.Services
 
         public async Task AddParticipant(int messageId, long telegramId, string userName, string firstName, string lastName, bool confirmed = false)
         {
-            // Use a default or configured roleId as needed
-            Guid defaultRoleId = Guid.NewGuid(); // Replace with your actual default role id logic
-            var user = await _userRepository.SaveUserIfNotExists(telegramId, userName, firstName, lastName, defaultRoleId);
+            //Guid defaultRoleId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+            var user = await _userRepository.SaveUserIfNotExists(telegramId, userName, firstName, lastName);
 
             var eventId = _repository.GetByMessageId(messageId).Id;
             var participant = new Participant()

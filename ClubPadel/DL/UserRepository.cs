@@ -50,7 +50,7 @@ namespace ClubPadel.DL
             return user;
         }
 
-        public async Task<User> SaveUserIfNotExists(long telegramId, string userName, string firstName, string lastName, Guid roleId)
+        public async Task<User> SaveUserIfNotExists(long telegramId, string userName, string firstName, string lastName, string roleName = "User")
         {
             var user = await _context.Users
                 .Include(u => u.UserRoles)
@@ -58,9 +58,13 @@ namespace ClubPadel.DL
 
             if (user == null)
             {
-                string displayName = firstName;
+                var displayName = firstName;
                 if (!string.IsNullOrEmpty(lastName))
                     displayName += " " + lastName.Substring(0, Math.Min(3, lastName.Length));
+
+                var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
+                if (role == null)
+                    throw new Exception($"Role '{roleName}' not found in Roles table. Please seed the Roles table.");
 
                 user = new User
                 {
@@ -71,7 +75,7 @@ namespace ClubPadel.DL
                     UserRoles = new List<UserRoles>()
                 };
 
-                var userRole = new UserRoles { RoleId = roleId, UserId = user.Id };
+                var userRole = new UserRoles { RoleId = role.Id, UserId = user.Id };
                 user.UserRoles.Add(userRole);
 
                 _context.UserRoles.Add(userRole);

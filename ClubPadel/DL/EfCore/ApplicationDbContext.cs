@@ -46,6 +46,8 @@ namespace ClubPadel.DL.EfCore
                 .HasForeignKey(ur => ur.RoleId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+
+
             //modelBuilder.HasPostgresExtension("uuid-ossp"); // Recommended for uuid generation
 
             //foreach (var entityType in modelBuilder.Model.GetEntityTypes())
