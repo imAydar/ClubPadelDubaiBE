@@ -21,6 +21,8 @@ namespace ClubPadel.Controllers
         [Route("webhook")]
         public async Task<IActionResult> HandleWebhook([FromBody] JsonDocument update)
         {
+            var logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "telegram_updates.log");
+            await System.IO.File.AppendAllTextAsync(logPath, $"{DateTime.UtcNow:O} {update.RootElement}\n");
             await _service.HandleWebhookAsync(update);
             return Ok();
         }

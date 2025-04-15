@@ -12,5 +12,7 @@ namespace ClubPadel.Models
         public string Name { get; set; }
 
         public List<UserRoles> UserRoles { get; set; }
+
+        public long TelegramId { get; set; }
     }
 }

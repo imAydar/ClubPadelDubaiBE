@@ -19,27 +19,33 @@ namespace ClubPadel.Services
         private readonly ITelegramBotClient _telegramBotClient;
         private readonly EventSqlRepository _repository;
         private readonly ParticipantSqlRepository _participantRepository;
+        private readonly UserRepository _userRepository;
 
         private readonly ILogger<EventService> _log;
 
         public EventService(ITelegramBotClient telegramBotClient, EventSqlRepository repository,
-            ParticipantSqlRepository participantRepository, ILogger<EventService> log)
+            ParticipantSqlRepository participantRepository, UserRepository userRepository, ILogger<EventService> log)
         {
             _telegramBotClient = telegramBotClient ?? throw new ArgumentNullException(nameof(telegramBotClient));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _participantRepository = participantRepository;
-
+            _userRepository = userRepository;
             _log = log;
         }
 
-        public async Task AddParticipant(int messageId, string userName, bool confirmed = false)
+        public async Task AddParticipant(int messageId, long telegramId, string userName, string firstName, string lastName, bool confirmed = false)
         {
+            // Use a default or configured roleId as needed
+            Guid defaultRoleId = Guid.NewGuid(); // Replace with your actual default role id logic
+            var user = await _userRepository.SaveUserIfNotExists(telegramId, userName, firstName, lastName, defaultRoleId);
+
             var eventId = _repository.GetByMessageId(messageId).Id;
             var participant = new Participant()
             {
                 Id = Guid.NewGuid(),
-                Name = userName,
+                Name = user.Name,
                 UserName = userName,
+                UserId = user.Id,
                 Confirmed = confirmed
             };
             await AddParticipant(eventId, participant);

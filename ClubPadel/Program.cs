@@ -55,6 +55,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddScoped<IBaseRepository<Event>, EventSqlRepository>();
 builder.Services.AddScoped<EventSqlRepository>();
 builder.Services.AddScoped<ParticipantSqlRepository>();
+builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<EventService>();
 
 builder.Services.AddHttpClient();

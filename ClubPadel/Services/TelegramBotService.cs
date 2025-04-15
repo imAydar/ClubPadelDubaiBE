@@ -60,6 +60,8 @@ namespace ClubPadel.Services
         {
             var userId = callbackQuery.GetProperty("from").GetProperty("id").GetInt64();
             var userName = callbackQuery.GetProperty("from").GetProperty("username").GetString();
+            var firstName = callbackQuery.GetProperty("from").GetProperty("first_name").GetString();
+            var lastName = callbackQuery.GetProperty("from").TryGetProperty("last_name", out var ln) ? ln.GetString() : string.Empty;
             var messageId = callbackQuery.GetProperty("message").GetProperty("message_id").GetInt32();
             var callbackData = callbackQuery.GetProperty("data").GetString();
 
@@ -79,10 +81,10 @@ namespace ClubPadel.Services
                     //    break;
                     
                 case "join_event":
-                    await _eventService.AddParticipant(messageId, userName);
+                    await _eventService.AddParticipant(messageId, userId, userName, firstName, lastName);
                     break;
                 case "join_event_confirmed":
-                    await _eventService.AddParticipant(messageId, userName, true);
+                    await _eventService.AddParticipant(messageId, userId, userName, firstName, lastName, true);
                     break;
                 case "exit_event":
                     await _eventService.RemoveParticipant(messageId, userName);
