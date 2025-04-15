@@ -20,12 +20,6 @@ namespace ClubPadel.Controllers
         private static readonly string _botToken = Environment.GetEnvironmentVariable("TgBotToken");
         private readonly UserRepository _repository = repository;
 
-        private static readonly Dictionary<Guid, string> _roles = new()
-        {
-            { default, "Admin" },
-            { Guid.NewGuid(), "Default" },
-        };
-
         [HttpPost("telegram")]
         public async Task<IActionResult> Authenticate([FromBody] TelegramInitDataRequest request)
         {
@@ -39,11 +33,14 @@ namespace ClubPadel.Controllers
             var userEntity = await _repository.GetUser(user.Username);
             if (userEntity == null)
             {
-
+                //return Unauthorized();
             }
 
-            var roles = userEntity.UserRoles?.Select(ur => new Claim(ClaimTypes.Role, _roles[ur.RoleId])) ??
-                [new Claim(ClaimTypes.Role, "Default")];
+            var roles = userEntity.UserRoles?
+                .Where(ur => ur.Role != null)
+                .Select(ur => new Claim(ClaimTypes.Role, ur.Role.Name))
+                .ToList()
+                ?? new List<Claim> { new Claim(ClaimTypes.Role, "Default") };
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_botToken);
@@ -52,7 +49,6 @@ namespace ClubPadel.Controllers
                 Subject = new ClaimsIdentity([
                     new Claim(ClaimTypes.Name, user.Username)
                 ]),
-                
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
@@ -62,7 +58,6 @@ namespace ClubPadel.Controllers
 
             return Ok(new { Token = tokenString });
         }
-
 
         private bool Validate(string initData)
         {
