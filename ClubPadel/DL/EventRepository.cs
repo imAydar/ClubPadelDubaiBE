@@ -109,5 +109,11 @@ namespace ClubPadel.DL
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task DeleteAsync(Participant participant)
+        {
+            _dbSet.Remove(participant);
+            await _context.SaveChangesAsync();
+        }
     }
 }

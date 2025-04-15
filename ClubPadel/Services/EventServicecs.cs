@@ -291,38 +291,16 @@ namespace ClubPadel.Services
         public async Task RemoveParticipant(Guid eventId, Guid participantId)
         {
             var eventItem = _repository.GetById(eventId);
-            var user = eventItem.Participants.FirstOrDefault(p => p.Id == participantId); //?? eventItem.Waitlist.FirstOrDefault(p => p.UserName == userName);
+            var participant = eventItem.Participants.FirstOrDefault(p => p.Id == participantId);
 
-
-
-            //if (user != null)
-            //{
-            //    await RemoveParticipant(eventItem.Id, user.Id);
-            //    return;
-            //}
-            //else
-            //{
-            //    user = eventItem.Waitlist.FirstOrDefault(p => p.UserName == userName);
-            //    if (user != null)
-            //    {
-            //        await RemoveWaiter(eventItem.Id, user.Id);
-            //        return;
-            //    }
-            //}
-            eventItem.Participants.RemoveAll(p => p.Id == user.Id);
-            if (!user.IsOnWaitList)
+            if (participant != null)
             {
-                var next = eventItem.Participants.OrderBy(p => p.CreatedAt).FirstOrDefault(p => p.IsOnWaitList);
-                if (next != null)
-                {
-                    next.IsOnWaitList = false;
-                }
+                await _participantRepository.DeleteAsync(participant);
+                eventItem.Participants.RemoveAll(p => p.Id == participantId);
+                _repository.Save(eventItem); // Save changes to the repository
+                await UpdateMessageWithParticipantsAsync(eventItem);
+                Console.WriteLine($"User {participant.UserName} removed from event {eventItem.Name}");
             }
-
-            _repository.Save(eventItem); // Save changes to the repository
-            await UpdateMessageWithParticipantsAsync(eventItem);
-
-            Console.WriteLine($"User {user.UserName} removed from event {eventItem.Name}");
         }
 
         ///// <summary>
