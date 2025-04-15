@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ClubPadel.DL;
+using ClubPadel.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Collections.Specialized;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -12,12 +15,19 @@ namespace ClubPadel.Controllers
 {
     [Route("api/auth")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController(UserRepository repository) : ControllerBase
     {
         private static readonly string _botToken = Environment.GetEnvironmentVariable("TgBotToken");
+        private readonly UserRepository _repository = repository;
+
+        private static readonly Dictionary<Guid, string> _roles = new()
+        {
+            { default, "Admin" },
+            { Guid.NewGuid(), "Default" },
+        };
 
         [HttpPost("telegram")]
-        public IActionResult Authenticate([FromBody] TelegramInitDataRequest request)
+        public async Task<IActionResult> Authenticate([FromBody] TelegramInitDataRequest request)
         {
             var user = ParseUser(request.InitData);
 
@@ -26,19 +36,27 @@ namespace ClubPadel.Controllers
             if (!Validate(Uri.UnescapeDataString(request.InitData)))
                 return Unauthorized();
 
-            string role = user.Username == "im_aydar" ? "admin" : "user";
+            var userEntity = await _repository.GetUser(user.Username);
+            if (userEntity == null)
+            {
+
+            }
+
+            var roles = userEntity.UserRoles?.Select(ur => new Claim(ClaimTypes.Role, _roles[ur.RoleId])) ??
+                [new Claim(ClaimTypes.Role, "Default")];
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_botToken);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity([
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, role)
+                    new Claim(ClaimTypes.Name, user.Username)
                 ]),
+                
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
+            tokenDescriptor.Subject.AddClaims(roles);
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 

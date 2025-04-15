@@ -17,6 +17,9 @@ namespace ClubPadel.Models
         //TODO: We might dont need it since we have date.
         public bool IsOnWaitList { get; set; }
 
+        public Guid? UserId { get; set; }
+        public User User { get; set; }
+
         //public Guid? WaitlistEventId { get; set; }
         //public Event? WaitlistEvent { get; set; }
     }

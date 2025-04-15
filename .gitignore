@@ -1,80 +1,72 @@
-# 🟢 Build & Compiled Files
+# .NET Core build folders
 bin/
 obj/
-[Bb]uild/
-[Dd]ebug*/
-[Rr]elease*/
-*.dll
-*.exe
-*.pdb
-*.cache
-*.log
 
-# 🟢 NuGet Packages
-*.nupkg
-packages/
-.nuget/
-project.lock.json
-project.assets.json
+# Visual Studio files
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
 
-# 🟢 User-Specific Files (VS, VS Code, Rider)
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# Visual Studio Code
 .vscode/
-.idea/
+*.code-workspace
+
+# User-specific files
+*.rsuser
 *.suo
 *.user
-*.rsuser
-*.sln.cache
-*.vs/
-*.ncrunch*
-*.nvuser
+*.userosscache
+*.sln.docstates
 
-# 🟢 ASP.NET / Blazor Generated Files
-wwwroot/
-node_modules/
-dist/
-bower_components/
+# NuGet Packages
+*.nupkg
+# NuGet Symbol Packages
+*.snupkg
+# The packages folder can be ignored because of Package Restore
+**/[Pp]ackages/*
+# except build/, which is used as an MSBuild target.
+!**/[Pp]ackages/build/
+# Uncomment if necessary however generally it will be regenerated when needed
+#!**/[Pp]ackages/repositories.config
+# NuGet v3's project.json files produces more ignorable files
+*.nuget.props
+*.nuget.targets
 
-# 🟢 Configuration / Secrets
-appsettings.Development.json
-appsettings.Local.json
-appsettings.Production.json
-secrets.json
-
-# 🟢 Logs & Debugging
+# Logs
 logs/
 *.log
-*.tlog
-*.cache
-*.pid
-*.bak
+npm-debug.log*
 
-# 🟢 Resharper / JetBrains Rider
-*.DotSettings.user
-.idea/
-resharper.xml
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# 🟢 Rider & VS Code settings
-.vscode/
-.idea/
-.vs/
-
-# 🟢 Docker & CI/CD
-Dockerfile
-docker-compose.yml
-.dockerignore
-
-# 🟢 System & OS files
+# OS generated files
 .DS_Store
-Thumbs.db
-*.swp
-*.swo
-
-# 🟢 Other IDE Configs
-*.sln.ide
-*.sln.iml
-*.sln.cache
-*.vscode/
-
-# 🟢 Generated Documentation
-*.xml
-docfx/
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db 

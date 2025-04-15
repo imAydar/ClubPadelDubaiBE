@@ -7,4 +7,10 @@ namespace ClubPadel.Models
     {
         public List<UserRoles> UserRoles { get; set; }
     }
+
+    public enum Roles
+    {
+        Default,
+        Admin
+    }
 }

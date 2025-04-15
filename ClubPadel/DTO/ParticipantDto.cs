@@ -10,5 +10,7 @@
         public Guid EventId { get; set; }
 
         public Guid? WaitlistEventId { get; set; }
+
+        public Guid? UserId { get; set; }
     }
 }

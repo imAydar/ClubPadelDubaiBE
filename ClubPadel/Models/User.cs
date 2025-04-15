@@ -8,6 +8,9 @@ namespace ClubPadel.Models
         [Required]
         [MaxLength(100)]
         public string UserName { get; set; }
+        [MaxLength(150)]
+        public string Name { get; set; }
+
         public List<UserRoles> UserRoles { get; set; }
     }
 }

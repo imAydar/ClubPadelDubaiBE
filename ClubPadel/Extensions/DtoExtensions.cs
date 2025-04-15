@@ -47,6 +47,7 @@ namespace ClubPadel.Extensions
             Confirmed = item.Confirmed,
             EventId = item.EventId ?? default,
             UserName = item.UserName,
+            UserId = item.UserId,
         };
 
         public static Participant ToEntity(this ParticipantDto dto) => new Participant
@@ -55,7 +56,8 @@ namespace ClubPadel.Extensions
             UserName = dto.UserName,
             Confirmed = dto.Confirmed,
             EventId = dto.EventId,
-            CreatedAt = DateTimeOffset.UtcNow
+            CreatedAt = DateTimeOffset.UtcNow,
+            UserId = dto.UserId
         };
     }
 }

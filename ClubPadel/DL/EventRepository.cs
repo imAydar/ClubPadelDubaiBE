@@ -52,13 +52,12 @@ namespace ClubPadel.DL
 
             if (entity != null)
             {
-                // Update only needed fields
                 entity.Name = participant.Name;
                 entity.Confirmed = participant.Confirmed;
                 entity.IsOnWaitList = participant.IsOnWaitList;
                 entity.UserName = participant.UserName;
                 entity.EventId = participant.EventId;
-                // etc.
+
                 _dbSet.Update(entity);
             }
             else

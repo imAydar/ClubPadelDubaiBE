@@ -132,30 +132,6 @@ namespace ClubPadel.Services
             Console.WriteLine($"Message sent: {responseString}");
         }
 
-        private async Task LikeEventAsync(long messageId, string userName)
-        {
-            if (!Likes.ContainsKey(messageId))
-            {
-                Likes[messageId] = new List<string>();
-            }
-
-            if (!Likes[messageId].Contains(userName))
-            {
-                Likes[messageId].Add(userName);
-            }
-
-            await UpdateMessageWithLikesAsync(messageId);
-        }
-
-        private async Task UnlikeEventAsync(long messageId, string userName)
-        {
-            if (Likes.ContainsKey(messageId))
-            {
-                Likes[messageId].Remove(userName);
-                await UpdateMessageWithLikesAsync(messageId);
-            }
-        }
-
         private async Task AddParticipantAsync(long messageId, string participantName)
         {
             if (!Likes.ContainsKey(messageId))
@@ -198,25 +174,6 @@ namespace ClubPadel.Services
                 Console.WriteLine($"Error updating message: {ex.Message}");
             }
         }
-
-        ////TODO: check if groupId != chatId(it definetely not, there could be channels)
-        //public async Task<bool> IsUserInGroup(ITelegramBotClient botClient, string username, long groupId)
-        //{
-        //    try
-        //    {
-        //        ChatMember member = await botClient.GetChatMemberCountAsync(groupId, username);
-        //        return member.Status != ChatMemberStatus.Left && member.Status != ChatMemberStatus.Kicked;
-        //    }
-        //    catch (Telegram.Bot.Exceptions.ApiRequestException ex)
-        //    {
-        //        if (ex.Message.Contains("user not found"))
-        //        {
-        //            return false;
-        //        }
-
-        //        throw;
-        //    }
-        //}
     }
 
     public interface ITelegramBotService
